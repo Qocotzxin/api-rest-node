@@ -7,6 +7,9 @@ const userRoles = {
 
 const Schema = mongoose.Schema;
 
+/**
+ * User schema
+ */
 const userSchema = new Schema({
   name: {
     type: String,
@@ -40,12 +43,18 @@ const userSchema = new Schema({
   }
 });
 
+/**
+ * Avoids returning password in responses
+ */
 userSchema.methods.toJSON = function() {
   const user = this.toObject();
   delete user.password;
   return user;
 }
 
+/**
+ * Sets plugin to validate unique fields
+ */
 userSchema.plugin(uniqueValidator, { message: '{PATH} must be unique.' });
 
 module.exports = mongoose.model("User", userSchema);

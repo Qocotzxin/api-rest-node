@@ -9,6 +9,9 @@ const unauthorizedError = {
   }
 };
 
+/**
+ * Performs login operation and returns a token
+ */
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
 

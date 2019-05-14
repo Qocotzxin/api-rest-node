@@ -6,6 +6,9 @@ const { tokenVerify, adminVerify } = require("../middlewares/authentication");
 
 const app = express();
 
+/**
+ * Get list of users
+ */
 app.get("/users", tokenVerify, (req, res) => {
   const startAt = Number(req.query.startAt) || 0;
   const limit = Number(req.query.limit) || 5;
@@ -24,6 +27,9 @@ app.get("/users", tokenVerify, (req, res) => {
     });
 });
 
+/**
+ * Creates new user
+ */
 app.post("/users", [tokenVerify, adminVerify], (req, res) => {
   const { name, email, role, password } = req.body;
 
@@ -41,6 +47,9 @@ app.post("/users", [tokenVerify, adminVerify], (req, res) => {
   });
 });
 
+/**
+ * Updates user information
+ */
 app.put("/users/:id", [tokenVerify, adminVerify], (req, res) => {
   const id = req.params.id;
   const body = _.pick(req.body, ["name", "email", "img", "role", "status"]);
@@ -57,6 +66,9 @@ app.put("/users/:id", [tokenVerify, adminVerify], (req, res) => {
   );
 });
 
+/**
+ * Deactivates a user
+ */
 app.delete("/users/:id", [tokenVerify, adminVerify], (req, res) => {
   const id = req.params.id;
 
