@@ -2,10 +2,11 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const _ = require("lodash");
 const User = require("../models/user");
+const { tokenVerify, adminVerify } = require("../middlewares/authentication");
 
 const app = express();
 
-app.get("/users", (req, res) => {
+app.get("/users", tokenVerify, (req, res) => {
   const startAt = Number(req.query.startAt) || 0;
   const limit = Number(req.query.limit) || 5;
 
@@ -13,43 +14,34 @@ app.get("/users", (req, res) => {
     .skip(startAt)
     .limit(limit)
     .exec((err, users) => {
-      if (err) {
-        return res.status(400).json(err);
-      }
+      if (err) return res.status(400).json(err);
 
       User.countDocuments({ status: true }, (err, length) => {
-        res.json({
-          ok: true,
-          users,
-          length
-        });
+        if (err) return res.status(500).json(err);
+
+        res.json({ users, length });
       });
     });
 });
 
-app.post("/users", (req, res) => {
-  const body = req.body;
+app.post("/users", [tokenVerify, adminVerify], (req, res) => {
+  const { name, email, role, password } = req.body;
 
   const user = new User({
-    name: body.name,
-    email: body.email,
-    password: bcrypt.hashSync(body.password, 10),
-    role: body.role
+    name: name,
+    email: email,
+    password: bcrypt.hashSync(password, 10),
+    role: role
   });
 
-  user.save((err, userDB) => {
-    if (err) {
-      return res.status(400).json(err);
-    }
+  user.save((err, user) => {
+    if (err) return res.status(400).json(err);
 
-    res.json({
-      ok: true,
-      user: userDB
-    });
+    res.json({ user });
   });
 });
 
-app.put("/users/:id", (req, res) => {
+app.put("/users/:id", [tokenVerify, adminVerify], (req, res) => {
   const id = req.params.id;
   const body = _.pick(req.body, ["name", "email", "img", "role", "status"]);
 
@@ -57,38 +49,25 @@ app.put("/users/:id", (req, res) => {
     id,
     body,
     { new: true, runValidators: true },
-    (err, userDB) => {
-      if (err) {
-        return res.status(400).json(err);
-      }
+    (err, user) => {
+      if (err) return res.status(400).json(err);
 
-      res.json({
-        ok: true,
-        user: userDB
-      });
+      res.json({ user });
     }
   );
 });
 
-app.delete("/users/:id", (req, res) => {
+app.delete("/users/:id", [tokenVerify, adminVerify], (req, res) => {
   const id = req.params.id;
 
   User.findByIdAndUpdate(id, { status: false }, { new: true }, (err, user) => {
-    if (err) {
-      return res.status(400).json(err);
-    }
+    if (err) return res.status(400).json(err);
 
     if (!user) {
-      return res.status(400).json({
-        ok: false,
-        error: "User not found"
-      });
+      return res.status(400).json({ error: "User not found" });
     }
 
-    res.json({
-      ok: true,
-      user
-    });
+    res.json({ user });
   });
 });
 

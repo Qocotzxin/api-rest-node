@@ -1,10 +1,27 @@
+const localDB = "mongodb://localhost:27017/coffe"; // Local DB url for database
+const productionDB = process.env.MONGO_URI; // Remote DB url set within Heroku
+
+/**
+ * Port number
+ */
 process.env.PORT = process.env.PORT || 3000;
 
+/**
+ * Environment
+ */
 process.env.NODE_ENV = process.env.NODE_ENV || "dev";
 
-const localDB = "mongodb://localhost:27017/coffe";
-const productionDB = process.env.MONGO_URI;
+/**
+ * Database url
+ */
+process.env.URL_DB = process.env.NODE_ENV === "dev" ? localDB : productionDB;
 
-let urlDB = process.env.NODE_ENV === "dev" ? localDB : productionDB;
+/**
+ * Token expiration
+ */
+process.env.TOKEN_EXPIRATION = '30 days';
 
-process.env.URL_DB = urlDB;
+/**
+ * Token seed (Set within Heroku)
+ */
+process.env.TOKEN_SEED = process.env.TOKEN_SEED || 'pchowypbldepymipkmzzyjsc';
