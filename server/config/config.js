@@ -19,9 +19,16 @@ process.env.URL_DB = process.env.NODE_ENV === "dev" ? localDB : productionDB;
 /**
  * Token expiration
  */
-process.env.TOKEN_EXPIRATION = '30 days';
+process.env.TOKEN_EXPIRATION = "30 days";
 
 /**
  * Token seed (Set within Heroku)
  */
-process.env.TOKEN_SEED = process.env.TOKEN_SEED || 'pchowypbldepymipkmzzyjsc';
+process.env.TOKEN_SEED = process.env.TOKEN_SEED || "pchowypbldepymipkmzzyjsc";
+
+/**
+ * Google Client ID
+ */
+process.env.CLIENT_ID =
+  process.env.CLIENT_ID ||
+  "350417717602-6cikko54vkskju7q467d2djrj2711gqk.apps.googleusercontent.com";
