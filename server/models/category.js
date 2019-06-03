@@ -12,7 +12,8 @@ const categorySchema = new Schema({
   },
   user: {
     type: Schema.Types.ObjectId,
-    ref: "User"
+    ref: "User",
+    required: [true, "User data is mandatory"]
   }
 });
 

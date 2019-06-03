@@ -10,7 +10,6 @@ const elementNotFound = id => {
   };
 };
 
-// GET todas las categorias con paginado
 app.get("/category", tokenVerify, (req, res) => {
   const skip = +req.query.skip || 0;
   const limit = +req.query.limit || 10;
@@ -18,14 +17,19 @@ app.get("/category", tokenVerify, (req, res) => {
   Category.find({})
     .skip(skip)
     .limit(limit)
+    .sort('description')
+    .populate('user', 'name email')
     .exec((err, categories) => {
       if (err) return res.status(400).json(err);
 
-      res.status(200).json({ categories });
+      Category.estimatedDocumentCount((err, length) => {
+        if (err) return res.status(500).json(err);
+
+        res.status(200).json({ categories, length });
+      });
     });
 });
 
-// GET categoria por id
 app.get("/category/:id", tokenVerify, (req, res) => {
   const id = req.params.id;
 
@@ -36,16 +40,15 @@ app.get("/category/:id", tokenVerify, (req, res) => {
   });
 });
 
-// POST crear categoria
 app.post("/category", [tokenVerify, adminVerify], (req, res) => {
   const { description } = req.body;
+  const id = req.user._id;
 
-  Category.create({ description })
+  Category.create({ description, user: id })
     .then(category => res.status(201).json({ category }))
-    .catch(err => res.status(400).json(err));
+    .catch(err => res.status(500).json(err));
 });
 
-// PUT actualizar categoria
 app.put("/category/:id", [tokenVerify, adminVerify], (req, res) => {
   const id = req.params.id;
   const { description } = req.body;
@@ -53,7 +56,7 @@ app.put("/category/:id", [tokenVerify, adminVerify], (req, res) => {
   Category.findByIdAndUpdate(
     id,
     { description },
-    { new: true },
+    { new: true, useFindAndModify: false, runValidators: true },
     (err, category) => {
       if (err) return res.status(404).json(elementNotFound(id));
 
@@ -62,7 +65,6 @@ app.put("/category/:id", [tokenVerify, adminVerify], (req, res) => {
   );
 });
 
-// DELETE telimina fisica de categoria (solo admin)
 app.delete("/category/:id", [tokenVerify, adminVerify], (req, res) => {
   const id = req.params.id;
 

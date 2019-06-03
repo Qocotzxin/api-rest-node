@@ -8,8 +8,7 @@ const tokenVerify = (req, res, next) => {
 
   jwt.verify(token, process.env.TOKEN_SEED, (err, decoded) => {
     if (err) return res.status(401).json({ err: { message: "Invalid token" } });
-
-    req.user = decoded.user;
+    req.user = decoded.user; 
     next();
   });
 };

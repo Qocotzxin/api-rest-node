@@ -47,7 +47,7 @@ app.post("/login", (req, res) => {
       return res.status(400).json(unauthorizedError);
     }
 
-    const token = createToken();
+    const token = createToken(user);
 
     return res.status(200).json({ user, token });
   });
@@ -75,7 +75,7 @@ app.post("/google", async (req, res) => {
       return newUser.save((err, createdUser) => {
         if (err) return res.status(500).json(err);
 
-        const token = createToken();
+        const token = createToken(createdUser);
 
         return res.status(201).json({
           user: createdUser,
@@ -92,7 +92,7 @@ app.post("/google", async (req, res) => {
       });
     }
 
-    const token = createToken();
+    const token = createToken(userDb);
 
     return res.status(200).json({
       user: userDb,
