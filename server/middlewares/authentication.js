@@ -8,7 +8,7 @@ const tokenVerify = (req, res, next) => {
 
   jwt.verify(token, process.env.TOKEN_SEED, (err, decoded) => {
     if (err) return res.status(401).json({ err: { message: "Invalid token" } });
-    req.user = decoded.user; 
+    req.user = decoded.user;
     next();
   });
 };
@@ -28,7 +28,21 @@ const adminVerify = (req, res, next) => {
   next();
 };
 
+/**
+ * Verifies token by URL
+ */
+const tokenImageToken = (req, res, next) => {
+  const token = req.query.token;
+
+  jwt.verify(token, process.env.TOKEN_SEED, (err, decoded) => {
+    if (err) return res.status(401).json({ err: { message: "Invalid token" } });
+    req.user = decoded.user;
+    next();
+  });
+};
+
 module.exports = {
   tokenVerify,
-  adminVerify
+  adminVerify,
+  tokenImageToken
 };
